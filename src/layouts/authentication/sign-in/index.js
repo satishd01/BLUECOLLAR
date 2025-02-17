@@ -30,18 +30,19 @@ function Basic() {
       email: email,
       password: password,
     };
-
+  
     try {
-      const response = await axios.post("https://api.blissiq.cloud/admin.login", payload);
-
-      if (response.data.status) {
-        localStorage.setItem("admin", JSON.stringify(response.data.admin));
+      const response = await axios.post("https://bluecollar.sndktech.online/api/admin/login", payload);
+  
+      if (response.data.message === "Login successful") {
+        // Save the token to local storage
+        localStorage.setItem("token", response.data.token);
         alert("Login successful! Redirecting to the dashboard..."); // Success message
         navigate("/dashboard"); // Navigate to the dashboard page
       } else {
         setErrorMessage("Login failed: " + (response.data.message || "Unknown error"));
       }
-
+  
       console.log(response.data);
     } catch (error) {
       console.error("Error logging in", error);

@@ -67,16 +67,17 @@ import Vendors from "layouts/tables/Vendors";
 import Categories from "layouts/tables/Categories";
 import Workers from "layouts/tables/Workers";
 import PostRequests from "layouts/tables/PostedJobs";
+import NEWDashboard from "layouts/dashboard/New-dasbord";
 
 const routes = [
-  // {
-  //   type: "collapse",
-  //   name: "Dashboard",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard",
-  //   component: <Dashboard />,
-  // },
+  {
+    type: "collapse",
+    name: "Dashboard",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <NEWDashboard />,
+  },
   {
     type: "collapse",
     name: " Users", // Adding the Students menu item
