@@ -145,7 +145,7 @@ export default function App() {
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
-        {!isAuthPage && layout === "dashboard" && (
+        {!isAuthPage && layout === "users" && (
           <>
             <Sidenav
               color={sidenavColor}
