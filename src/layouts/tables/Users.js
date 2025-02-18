@@ -103,7 +103,7 @@ function Users() {
       formData.append('photo', newUser.photo); // Assuming you have a way to handle file upload
 
       const response = await fetch(
-        `https://bluecollar.sndktech.online/api/profiles/profiles/${newUser.id}`,
+        `https://bluecollar.sndktech.online/api/profiles/profiles/ ${newUser.user_id}`, // Use user_id
         {
           method: "PUT",
           body: formData,
@@ -117,7 +117,7 @@ function Users() {
       if (response.ok) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === newUser.id ? { ...user, ...newUser } : user
+            user.user_id === newUser.user_id ? { ...user, ...newUser } : user
           )
         );
         setOpenModal(false);
@@ -142,7 +142,7 @@ function Users() {
     if (confirmDelete) {
       try {
         const response = await fetch(
-          `https://bluecollar.sndktech.online/api/signup/users/${userId}`,
+          `https://bluecollar.sndktech.online/api/auth/user/delete/ ${userId}`, // Use user_id
           {
             method: "DELETE",
           }
@@ -152,9 +152,9 @@ function Users() {
         }
         const result = await response.json();
 
-        if (result.success) {
+        if (result.message) {
           setUsers((prevUsers) =>
-            prevUsers.filter((user) => user.id !== userId)
+            prevUsers.filter((user) => user.user_id !== userId) // Filter by user_id
           );
           alert("User deleted successfully!");
         } else {
@@ -230,7 +230,7 @@ function Users() {
           <Button
             variant="contained"
             color="error"
-            onClick={() => handleDeleteUser(row.original.id)}
+            onClick={() => handleDeleteUser(row.original.user_id)} // Pass user_id
             sx={{ marginLeft: 1 }}
           >
             Delete
@@ -256,23 +256,6 @@ function Users() {
                 <MDBox sx={{ flex: 1, overflow: "auto" }}>
                   <DataTable table={{ columns, rows: users }} isSorted={false} entriesPerPage={false} showTotalEntries={false} noEndBorder />
                 </MDBox>
-                {/* <Button
-                  variant="contained"
-                  color="white"
-                  sx={{
-                    position: "absolute",
-                    top: 20,
-                    right: 20,
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "#d32f2f",
-                    },
-                  }}
-                  onClick={() => handleOpenModal()}
-                >
-                  Create User
-                </Button> */}
               </MDBox>
             </Card>
           </Grid>
@@ -282,7 +265,7 @@ function Users() {
 
       {/* Modal for creating or editing user */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>{newUser.id ? "Edit User" : "Create User"}</DialogTitle>
+        <DialogTitle>{newUser.user_id ? "Edit User" : "Create User"}</DialogTitle>
         <DialogContent>
           <TextField
             label="Full Name"
@@ -322,8 +305,8 @@ function Users() {
           <Button onClick={() => setOpenModal(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={newUser.id ? handleUpdateUser : handleCreateUser} color="primary">
-            {newUser.id ? "Update" : "Create"}
+          <Button onClick={newUser.user_id ? handleUpdateUser : handleCreateUser} color="primary">
+            {newUser.user_id ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>

@@ -226,7 +226,7 @@ function Vendors() {
     if (confirmDelete) {
       try {
         const response = await fetch(
-          `https://bluecollar.sndktech.online/api/signup/users/${vendorId}`,
+          `https://bluecollar.sndktech.online/api/auth/vendor/delete/${vendorId}`,
           {
             method: "DELETE",
           }

@@ -1,22 +1,7 @@
-/**
-=========================================================
-* BLISSIQ ADMIN React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
 // react-router components
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -59,6 +44,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const navigate = useNavigate(); // Import and use the navigate function
 
   useEffect(() => {
     // Setting the navbar type
@@ -91,6 +77,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 
+  // Handle Logout
+  const handleLogout = () => {
+    // Add any additional logout logic here (e.g., clearing user session)
+    navigate("/authentication/sign-in");
+  };
+
   // Render the notifications menu
   const renderMenu = () => (
     <Menu
@@ -116,7 +108,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       let colorValue = light || darkMode ? white.main : dark.main;
 
       if (transparentNavbar && !light) {
-        colorValue = darkMode ? rgba(text.main, 0.6) : text.main;
+        colorValue = darkMode ? rgba(text.main, 0.) : text.main;
       }
 
       return colorValue;
@@ -177,6 +169,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 {/* <Icon sx={iconsStyle}>notifications</Icon> */}
               </IconButton>
               {renderMenu()}
+              <IconButton
+                size="small"
+                disableRipple
+                color="inherit"
+                sx={navbarIconButton}
+                onClick={handleLogout}
+              >
+                <Icon sx={iconsStyle}>logout</Icon>
+              <h5>Logout</h5>
+              </IconButton>
             </MDBox>
           </MDBox>
         )}
