@@ -9,10 +9,17 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Button,
+  Typography,
+  Grid,
+  Card,
+  Box,
+  IconButton,
+  InputAdornment,
+  Checkbox,
+  ListItemText,
+  Autocomplete,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
 
 // BLISSIQ ADMIN React components
 import MDBox from "components/MDBox";
@@ -34,7 +41,12 @@ function Workers() {
     service_charge: 0,
     category_id: null,
     services: [],
+    available_slots: [],
+    vendor_id: null,
   });
+  const [servicesOptions, setServicesOptions] = useState([
+    "plumber", "electric", "cleaning", "furniture", "wiring", "Car Repairing", "Bike Repairing", "cleaner"
+  ]);
 
   // Fetch workers data
   useEffect(() => {
@@ -68,9 +80,11 @@ function Workers() {
       if (newWorker.image) {
         formData.append('image', newWorker.image);
       }
-      formData.append('services', newWorker.services.join(','));
+      formData.append('services', JSON.stringify(newWorker.services));
+      formData.append('available_slots', JSON.stringify(newWorker.available_slots));
+      formData.append('vendor_id', newWorker.vendor_id);
 
-      const response = await fetch("https://bluecollar.sndktech.online/worker/list", {
+      const response = await fetch("https://bluecollar.sndktech.online/worker/save", {
         method: "POST",
         body: formData,
       });
@@ -93,6 +107,8 @@ function Workers() {
           service_charge: 0,
           category_id: null,
           services: [],
+          available_slots: [],
+          vendor_id: null,
         });
         alert("Worker created successfully!");
       } else {
@@ -113,7 +129,9 @@ function Workers() {
       if (newWorker.image) {
         formData.append('image', newWorker.image);
       }
-      formData.append('services', newWorker.services.join(','));
+      formData.append('services', JSON.stringify(newWorker.services));
+      formData.append('available_slots', JSON.stringify(newWorker.available_slots));
+      formData.append('vendor_id', newWorker.vendor_id);
 
       const response = await fetch(
         `https://bluecollar.sndktech.online/worker/list/${newWorker.id}`,
@@ -140,6 +158,8 @@ function Workers() {
           service_charge: 0,
           category_id: null,
           services: [],
+          available_slots: [],
+          vendor_id: null,
         });
         alert("Worker updated successfully!");
       } else {
@@ -156,7 +176,7 @@ function Workers() {
     if (confirmDelete) {
       try {
         const response = await fetch(
-          `https://bluecollar.sndktech.online/worker/list/${workerId}`,
+          `https://bluecollar.sndktech.online/worker/delete/${workerId}`,
           {
             method: "DELETE",
           }
@@ -166,7 +186,7 @@ function Workers() {
         }
         const result = await response.json();
 
-        if (result.success) {
+        if (result.message) {
           setWorkers((prevWorkers) =>
             prevWorkers.filter((worker) => worker.id !== workerId)
           );
@@ -199,9 +219,15 @@ function Workers() {
         service_charge: 0,
         category_id: null,
         services: [],
+        available_slots: [],
+        vendor_id: null,
       });
     }
     setOpenModal(true);
+  };
+
+  const handleServiceChange = (event, value) => {
+    setNewWorker({ ...newWorker, services: value });
   };
 
   if (loading) {
@@ -348,13 +374,90 @@ function Workers() {
             margin="normal"
           />
           <TextField
-            label="Services (comma-separated)"
+            label="Vendor ID"
             fullWidth
-            name="services"
-            value={newWorker.services.join(',')}
-            onChange={(e) => setNewWorker({ ...newWorker, services: e.target.value.split(',') })}
+            name="vendor_id"
+            type="number"
+            value={newWorker.vendor_id}
+            onChange={handleInputChange}
             margin="normal"
           />
+          <Autocomplete
+            multiple
+            options={servicesOptions}
+            value={newWorker.services}
+            onChange={handleServiceChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Services"
+                placeholder="Select services"
+                fullWidth
+                margin="normal"
+              />
+            )}
+          />
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h6">Available Slots</Typography>
+            {newWorker.available_slots.map((slot, index) => (
+              <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <TextField
+                  label="Date"
+                  fullWidth
+                  name={`available_slots[${index}].date`}
+                  type="date"
+                  value={slot.date}
+                  onChange={(e) => {
+                    const newSlots = [...newWorker.available_slots];
+                    newSlots[index].date = e.target.value;
+                    setNewWorker({ ...newWorker, available_slots: newSlots });
+                  }}
+                  margin="normal"
+                />
+                <TextField
+                  label="Start Time"
+                  fullWidth
+                  name={`available_slots[${index}].startTime`}
+                  type="time"
+                  value={slot.startTime}
+                  onChange={(e) => {
+                    const newSlots = [...newWorker.available_slots];
+                    newSlots[index].startTime = e.target.value;
+                    setNewWorker({ ...newWorker, available_slots: newSlots });
+                  }}
+                  margin="normal"
+                />
+                <TextField
+                  label="End Time"
+                  fullWidth
+                  name={`available_slots[${index}].endTime`}
+                  type="time"
+                  value={slot.endTime}
+                  onChange={(e) => {
+                    const newSlots = [...newWorker.available_slots];
+                    newSlots[index].endTime = e.target.value;
+                    setNewWorker({ ...newWorker, available_slots: newSlots });
+                  }}
+                  margin="normal"
+                />
+                <IconButton onClick={() => {
+                  const newSlots = [...newWorker.available_slots];
+                  newSlots.splice(index, 1);
+                  setNewWorker({ ...newWorker, available_slots: newSlots });
+                }}>
+                  <Typography variant="body2" color="error">
+                    Remove
+                  </Typography>
+                </IconButton>
+              </Box>
+            ))}
+            <Button variant="contained" color="primary" onClick={() => {
+              const newSlots = [...newWorker.available_slots, { date: '', startTime: '', endTime: '' }];
+              setNewWorker({ ...newWorker, available_slots: newSlots });
+            }}>
+              Add Slot
+            </Button>
+          </Box>
           <input
             type="file"
             name="image"

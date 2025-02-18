@@ -29,8 +29,7 @@ function Banners() {
   const [openModal, setOpenModal] = useState(false);
   const [newBanner, setNewBanner] = useState({
     banner_type: "image",
-    banner_url: "",
-    screen_time: 0,
+    screen_time: 40,
     position: "Header",
     isActive: true,
     isDeleted: false,
@@ -58,19 +57,33 @@ function Banners() {
 
   const handleCreateBanner = async () => {
     try {
-      const response = await axios.post("https://bluecollar.sndktech.online/api/banners", newBanner);
-      if (response.status === 200) {
+      const formData = new FormData();
+      formData.append('banner_type', newBanner.banner_type);
+      formData.append('screen_time', newBanner.screen_time);
+      formData.append('position', newBanner.position);
+      formData.append('isActive', newBanner.isActive ? "TRUE" : "FALSE");
+      if (newBanner.banner_url) {
+        formData.append('banner', newBanner.banner_url);
+      }
+
+      const response = await axios.post("https://bluecollar.sndktech.online/api/banners/create", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.status === 201) {
         setBanners([...banners, response.data]);
         setOpenModal(false);
         setNewBanner({
           banner_type: "image",
           banner_url: "",
-          screen_time: 0,
+          screen_time: 40,
           position: "Header",
           isActive: true,
           isDeleted: false,
         });
-        setModalKey(prevKey => prevKey + 1); // Reset the modal
+        setModalKey(prevKey => prevKey + 1); 
         alert("Banner created successfully!");
       } else {
         alert(response.data.error || "Failed to create banner");
@@ -83,7 +96,7 @@ function Banners() {
   const handleUpdateBanner = async () => {
     try {
       const response = await axios.put(
-        `https://bluecollar.sndktech.online/api/banners/${newBanner.id}`,
+        `https://bluecollar.sndktech.online/api/banners/update/${newBanner.id}`,
         newBanner
       );
       if (response.status === 200) {
@@ -92,7 +105,7 @@ function Banners() {
         setNewBanner({
           banner_type: "image",
           banner_url: "",
-          screen_time: 0,
+          screen_time: 40,
           position: "Header",
           isActive: true,
           isDeleted: false,
@@ -111,7 +124,7 @@ function Banners() {
     if (window.confirm("Are you sure you want to delete this banner?")) {
       try {
         const response = await axios.delete(
-          `https://bluecollar.sndktech.online/api/banners/${id}`
+          `https://bluecollar.sndktech.online/api/banners/delete/${id}`
         );
         if (response.status === 200) {
           setBanners(banners.filter(b => b.id !== id));
@@ -142,7 +155,7 @@ function Banners() {
     setNewBanner({
       banner_type: "image",
       banner_url: "",
-      screen_time: 0,
+      screen_time: 40,
       position: "Header",
       isActive: true,
       isDeleted: false,
@@ -150,7 +163,11 @@ function Banners() {
   };
 
   const handleInputChange = (e) => {
-    setNewBanner({...newBanner, [e.target.name]: e.target.value});
+    if (e.target.name === 'banner_url' && e.target.files) {
+      setNewBanner({...newBanner, [e.target.name]: e.target.files[0]});
+    } else {
+      setNewBanner({...newBanner, [e.target.name]: e.target.value});
+    }
   };
 
   if (loading) {
@@ -290,7 +307,7 @@ function Banners() {
             fullWidth margin="normal"
             label="Banner URL"
             name="banner_url"
-            value={newBanner.banner_url}
+            type="file"
             onChange={handleInputChange}
           />
           <TextField
@@ -313,6 +330,10 @@ function Banners() {
               <MenuItem value="Footer">Footer</MenuItem>
             </Select>
           </FormControl>
+          <FormControlLabel
+            control={<Switch checked={newBanner.isActive} onChange={(e) => setNewBanner({...newBanner, isActive: e.target.checked})} />}
+            label="Is Active"
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>

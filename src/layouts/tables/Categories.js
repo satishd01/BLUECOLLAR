@@ -102,7 +102,7 @@ function Categories() {
       }
 
       const response = await fetch(
-        `https://bluecollar.sndktech.online/api/categories/${newCategory.id}`,
+        `https://bluecollar.sndktech.online/api/categories/categories/${newCategory.id}`,
         {
           method: "PUT",
           body: formData,

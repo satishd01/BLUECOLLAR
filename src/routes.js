@@ -68,6 +68,7 @@ import Categories from "layouts/tables/Categories";
 import Workers from "layouts/tables/Workers";
 import PostRequests from "layouts/tables/PostedJobs";
 import NEWDashboard from "layouts/dashboard/New-dasbord";
+import Orders from "layouts/tables/Orders";
 
 const routes = [
   {
@@ -143,6 +144,7 @@ const routes = [
     component: <Banners />, // The component to render
     layout: "/admin",
   },
+  
   {
     type: "collapse",
     name: "Job-Requests", // Adding the Schools menu item
@@ -154,6 +156,19 @@ const routes = [
       </i>
     ), // Icon for schools
     component: < PostRequests/>, // The component to render
+    layout: "/admin",
+  },
+  {
+    type: "collapse",
+    name: "Orders", // Adding the Schools menu item
+    key: "Orders",
+    route: "/Orders",
+    icon: (
+      <i className="material-icons" style={{ color: "white" }}>
+        school
+      </i>
+    ), // Icon for schools
+    component: < Orders/>, // The component to render
     layout: "/admin",
   },
 

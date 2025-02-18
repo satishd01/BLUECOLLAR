@@ -46,7 +46,22 @@ function Vendors() {
     account_number: "",
     ifsc_code: "",
     photo: null, // Added to handle file uploads
+    user_id: "", // Added to handle user_id
   });
+
+  // Helper function to convert date format
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
 
   // Fetch vendors data
   useEffect(() => {
@@ -58,7 +73,10 @@ function Vendors() {
         }
         const data = await response.json();
         if (data && data.totalRecords) {
-          setVendors(data.data.reverse());
+          setVendors(data.data.map(vendor => ({
+            ...vendor,
+            dob: formatDate(vendor.dob), // Convert date format
+          })).reverse());
         }
       } catch (error) {
         console.error("Error fetching vendor data:", error);
@@ -88,6 +106,7 @@ function Vendors() {
           ...prev,
           {
             ...result.data,
+            dob: formatDate(result.data.dob), // Convert date format
           },
         ]);
         setOpenModal(false);
@@ -109,6 +128,7 @@ function Vendors() {
           account_number: "",
           ifsc_code: "",
           photo: null,
+          user_id: "",
         });
         alert("Vendor created successfully!");
       } else {
@@ -123,43 +143,52 @@ function Vendors() {
   const handleUpdateVendor = async () => {
     try {
       const formData = new FormData();
+
+      // Append all fields to the FormData object
       formData.append('full_name', newVendor.full_name);
-      formData.append('email', newVendor.email);
       formData.append('phone_number', newVendor.phone_number);
-      formData.append('gender', newVendor.gender);
       formData.append('dob', newVendor.dob);
       formData.append('age', newVendor.age);
       formData.append('aadhar_card_number', newVendor.aadhar_card_number);
       formData.append('pancard_number', newVendor.pancard_number);
-      formData.append('flat_no', newVendor.flat_no);
       formData.append('landmark', newVendor.landmark);
       formData.append('city', newVendor.city);
       formData.append('pincode', newVendor.pincode);
       formData.append('name_as_per_bank_details', newVendor.name_as_per_bank_details);
       formData.append('account_number', newVendor.account_number);
       formData.append('ifsc_code', newVendor.ifsc_code);
+      formData.append('gender', newVendor.gender);
+      formData.append('flat_no', newVendor.flat_no);
+
+      // Append the photo file if it exists
       if (newVendor.photo) {
         formData.append('photo', newVendor.photo);
       }
 
+      // Send the PUT request with FormData
       const response = await fetch(
-        `https://bluecollar.sndktech.online/api/vendors/${newVendor.id}`,
+        `https://bluecollar.sndktech.online/api/vendors/${newVendor.user_id}`,
         {
           method: "PUT",
           body: formData,
         }
       );
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+
       const result = await response.json();
 
       if (response.ok) {
+        // Update the vendors list with the updated vendor data
         setVendors((prevVendors) =>
           prevVendors.map((vendor) =>
-            vendor.id === newVendor.id ? { ...vendor, ...newVendor } : vendor
+            vendor.id === newVendor.id ? { ...vendor, ...newVendor, dob: formatDate(newVendor.dob) } : vendor
           )
         );
+
+        // Close the modal and reset the form
         setOpenModal(false);
         setNewVendor({
           full_name: "",
@@ -179,7 +208,9 @@ function Vendors() {
           account_number: "",
           ifsc_code: "",
           photo: null,
+          user_id: "",
         });
+
         alert("Vendor updated successfully!");
       } else {
         alert(result.error || "Failed to update vendor");
@@ -230,7 +261,10 @@ function Vendors() {
 
   const handleOpenModal = (vendor = null) => {
     if (vendor) {
-      setNewVendor(vendor);
+      setNewVendor({
+        ...vendor,
+        dob: formatDate(vendor.dob), // Ensure date is in the correct format
+      });
     } else {
       setNewVendor({
         full_name: "",
@@ -250,6 +284,7 @@ function Vendors() {
         account_number: "",
         ifsc_code: "",
         photo: null,
+        user_id: "",
       });
     }
     setOpenModal(true);
@@ -337,23 +372,6 @@ function Vendors() {
                 <MDBox sx={{ flex: 1, overflow: "auto" }}>
                   <DataTable table={{ columns, rows: vendors }} isSorted={false} entriesPerPage={false} showTotalEntries={false} noEndBorder />
                 </MDBox>
-                {/* <Button
-                  variant="contained"
-                  color="white"
-                  sx={{
-                    position: "absolute",
-                    top: 20,
-                    right: 20,
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "#d32f2f",
-                    },
-                  }}
-                  onClick={() => handleOpenModal()}
-                >
-                  Create Vendor
-                </Button> */}
               </MDBox>
             </Card>
           </Grid>
@@ -495,8 +513,8 @@ function Vendors() {
           <Button onClick={() => setOpenModal(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={newVendor.id ? handleUpdateVendor : handleCreateVendor} color="primary">
-            {newVendor.id ? "Update" : "Create"}
+          <Button onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} color="primary">
+            {newVendor.user_id ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>

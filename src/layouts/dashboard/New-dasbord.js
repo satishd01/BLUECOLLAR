@@ -6,15 +6,18 @@ import Grid from "@mui/material/Grid";
 
 // BLISSIQ ADMIN React components
 import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
 
 // BLISSIQ ADMIN React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import DataTable from "examples/Tables/DataTable";
 
 function NEWDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
+  const [lastBookings, setLastBookings] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -29,10 +32,23 @@ function NEWDashboard() {
       }
     };
 
+    const fetchLastBookings = async () => {
+      try {
+        const response = await axios.get("https://bluecollar.sndktech.online/api/dashboard/last/bookings");
+        if (response.data && response.data.bookings) {
+          setLastBookings(response.data.bookings);
+        }
+      } catch (error) {
+        console.error("Error fetching last bookings:", error);
+        alert("Failed to fetch last bookings. Please check your network connection and try again.");
+      }
+    };
+
     fetchDashboardData();
+    fetchLastBookings();
   }, []);
 
-  if (!dashboardData) {
+  if (!dashboardData || !lastBookings) {
     return (
       <DashboardLayout>
         <DashboardNavbar />
@@ -52,6 +68,17 @@ function NEWDashboard() {
       </DashboardLayout>
     );
   }
+
+  const columns = [
+    { Header: "Booking ID", accessor: "booking_id" },
+    { Header: "User ID", accessor: "user_id" },
+    { Header: "Total Amount", accessor: "total_amount" },
+    { Header: "Service Name", accessor: "service_name" },
+    { Header: "Worker Name", accessor: "worker_name" },
+    { Header: "Service Charge", accessor: "service_charge" },
+    { Header: "Service Date", accessor: "service_date" },
+    { Header: "Status", accessor: "status" },
+  ];
 
   return (
     <DashboardLayout>
@@ -133,6 +160,24 @@ function NEWDashboard() {
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 {/* Placeholder for ReportsLineChart */}
+              </MDBox>
+            </Grid>
+          </Grid>
+        </MDBox>
+        <MDBox mt={0}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <MDBox mb={3}>
+                <MDTypography variant="h5" color="text">
+                  Last 10 Bookings
+                </MDTypography>
+                <DataTable
+                  table={{ columns, rows: lastBookings }}
+                  isSorted={false}
+                  entriesPerPage={true}
+                  showTotalEntries={false}
+                  noEndBorder
+                />
               </MDBox>
             </Grid>
           </Grid>
