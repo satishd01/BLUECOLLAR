@@ -41,7 +41,7 @@ function Workers() {
     service_charge: 0,
     category_id: null,
     services: [],
-    available_slots: [],
+    available_slots: [], // Ensure this is initialized as an empty array
     vendor_id: null,
   });
   const [servicesOptions, setServicesOptions] = useState([
@@ -211,7 +211,10 @@ function Workers() {
 
   const handleOpenModal = (worker = null) => {
     if (worker) {
-      setNewWorker(worker);
+      setNewWorker({
+        ...worker,
+        available_slots: worker.available_slots || [], // Ensure available_slots is an array
+      });
     } else {
       setNewWorker({
         name: "",
@@ -397,16 +400,16 @@ function Workers() {
               />
             )}
           />
-          <Box sx={{ mt: 2 }}>
+          {/* <Box sx={{ mt: 2 }}>
             <Typography variant="h6">Available Slots</Typography>
-            {newWorker.available_slots.map((slot, index) => (
+            {(newWorker.available_slots || []).map((slot, index) => ( // Ensure available_slots is an array
               <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <TextField
                   label="Date"
                   fullWidth
                   name={`available_slots[${index}].date`}
                   type="date"
-                  value={slot.date}
+                  value={slot.date || ''}
                   onChange={(e) => {
                     const newSlots = [...newWorker.available_slots];
                     newSlots[index].date = e.target.value;
@@ -419,7 +422,7 @@ function Workers() {
                   fullWidth
                   name={`available_slots[${index}].startTime`}
                   type="time"
-                  value={slot.startTime}
+                  value={slot.startTime || ''}
                   onChange={(e) => {
                     const newSlots = [...newWorker.available_slots];
                     newSlots[index].startTime = e.target.value;
@@ -432,7 +435,7 @@ function Workers() {
                   fullWidth
                   name={`available_slots[${index}].endTime`}
                   type="time"
-                  value={slot.endTime}
+                  value={slot.endTime || ''}
                   onChange={(e) => {
                     const newSlots = [...newWorker.available_slots];
                     newSlots[index].endTime = e.target.value;
@@ -457,7 +460,7 @@ function Workers() {
             }}>
               Add Slot
             </Button>
-          </Box>
+          </Box> */}
           <input
             type="file"
             name="image"
