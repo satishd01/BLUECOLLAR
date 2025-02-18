@@ -283,7 +283,7 @@ function Workers() {
       accessor: "actions",
       Cell: ({ row }) => (
         <>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             onClick={() => {
@@ -292,7 +292,7 @@ function Workers() {
             }}
           >
             Edit
-          </Button>
+          </Button> */}
           <Button
             variant="contained"
             color="error"
