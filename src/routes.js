@@ -43,8 +43,7 @@ import CreateUniversity from "University/CreateUniversity";
 import GETUniversity from "layouts/tables/GETUniversity";
 
 // Grades components
-import CreateGrade from "./Grades/CreateGrade";
-import GetGrades from "layouts/tables/GetGrades";
+// import CreateGrade from "./Grades/CreateGrade";
 
 // Subject components
 import CreateSubject from "./Subjects/CreateSubject";
@@ -69,6 +68,7 @@ import Workers from "layouts/tables/Workers";
 import PostRequests from "layouts/tables/PostedJobs";
 import NEWDashboard from "layouts/dashboard/New-dasbord";
 import Orders from "layouts/tables/Orders";
+import GovernmentJobs from "layouts/tables/Govtjobs";
 
 const routes = [
   {
@@ -169,6 +169,19 @@ const routes = [
       </i>
     ), // Icon for schools
     component: < Orders/>, // The component to render
+    layout: "/admin",
+  },
+  {
+    type: "collapse",
+    name: "Govt Jobs", // Adding the Schools menu item
+    key: "Govt Jobs",
+    route: "/govt-jobs",
+    icon: (
+      <i className="material-icons" style={{ color: "white" }}>
+        school
+      </i>
+    ), // Icon for schools
+    component: < GovernmentJobs/>, // The component to render
     layout: "/admin",
   },
 

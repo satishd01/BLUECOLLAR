@@ -13,6 +13,7 @@ import {
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
+import { Input } from "@mui/material";
 
 // BLISSIQ ADMIN React components
 import MDBox from "components/MDBox";
@@ -36,6 +37,7 @@ function PostRequests() {
     date: "",
     time: "",
     user_id: null,
+    attach: null, // Added attach field
   });
 
   // Fetch post requests data
@@ -71,8 +73,11 @@ function PostRequests() {
       formData.append('date', newRequest.date);
       formData.append('time', newRequest.time);
       formData.append('user_id', newRequest.user_id);
+      if (newRequest.attach) {
+        formData.append('attach', newRequest.attach); // Include the file if provided
+      }
 
-      const response = await fetch("https://bluecollar.sndktech.online/api/post-requests", {
+      const response = await fetch("https://bluecollar.sndktech.online/api/post-request", {
         method: "POST",
         body: formData,
       });
@@ -97,6 +102,7 @@ function PostRequests() {
           date: "",
           time: "",
           user_id: null,
+          attach: null, // Reset attach field
         });
         alert("Post request created successfully!");
       } else {
@@ -115,9 +121,12 @@ function PostRequests() {
       formData.append('location', newRequest.location);
       formData.append('price', newRequest.price);
       formData.append('service_description', newRequest.service_description);
-      formData.append('date', newRequest.date);
+      formData.append('date', formatDate(newRequest.date)); // Format the date
       formData.append('time', newRequest.time);
       formData.append('user_id', newRequest.user_id);
+      if (newRequest.attach) {
+        formData.append('attach', newRequest.attach); // Include the file if provided
+      }
 
       const response = await fetch(
         `https://bluecollar.sndktech.online/api/post-requests/${newRequest.id}`,
@@ -146,6 +155,7 @@ function PostRequests() {
           date: "",
           time: "",
           user_id: null,
+          attach: null, // Reset attach field
         });
         alert("Post request updated successfully!");
       } else {
@@ -155,6 +165,12 @@ function PostRequests() {
       console.error("Error updating post request:", error);
       alert("Failed to update post request. Please check your network connection and try again.");
     }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "";
+    const [year, month, day] = new Date(date).toISOString().split("T")[0].split("-");
+    return `${year}-${month}-${day}`;
   };
 
   const handleDeleteRequest = async (requestId) => {
@@ -171,14 +187,14 @@ function PostRequests() {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-
-        if (result.success) {
+  
+        if (result.message) {
           setRequests((prevRequests) =>
             prevRequests.filter((request) => request.id !== requestId)
           );
           alert("Post request deleted successfully!");
         } else {
-          alert(result.error || "Failed to delete post request");
+          alert(result.message || "Failed to delete post request");
         }
       } catch (error) {
         console.error("Error deleting post request:", error);
@@ -188,7 +204,11 @@ function PostRequests() {
   };
 
   const handleInputChange = (e) => {
-    setNewRequest({ ...newRequest, [e.target.name]: e.target.value });
+    if (e.target.name === "attach") {
+      setNewRequest({ ...newRequest, [e.target.name]: e.target.files[0] });
+    } else {
+      setNewRequest({ ...newRequest, [e.target.name]: e.target.value });
+    }
   };
 
   const handleOpenModal = (request = null) => {
@@ -203,6 +223,7 @@ function PostRequests() {
         date: "",
         time: "",
         user_id: null,
+        attach: null, // Reset attach field
       });
     }
     setOpenModal(true);
@@ -368,6 +389,12 @@ function PostRequests() {
             name="user_id"
             type="number"
             value={newRequest.user_id}
+            onChange={handleInputChange}
+            margin="normal"
+          />
+          <Input
+            type="file"
+            name="attach"
             onChange={handleInputChange}
             margin="normal"
           />

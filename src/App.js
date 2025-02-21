@@ -37,7 +37,6 @@ import { TempletesScreen } from "layouts/templetes";
 
 // Import Grades components
 import CreateGrade from "./Grades/CreateGrade";
-import GetGrades from "layouts/tables/GetGrades";
 import UpdateGrade from "./Grades/UpdateGrade";
 
 // Import Subject components
@@ -169,7 +168,6 @@ export default function App() {
             key="templete-screens"
           />
           <Route path="/grades/create" element={<CreateGrade />} />
-          <Route path="/grades" element={<GetGrades />} />
           <Route path="/grades/update/:id" element={<UpdateGrade />} />
           <Route path="/subjects/create" element={<CreateSubject />} />
           <Route path="/subjects" element={<GetSubjects />} />
@@ -205,7 +203,6 @@ export default function App() {
           key="templete-screens"
         />
         <Route path="/grades/create" element={<CreateGrade />} />
-        <Route path="/grades" element={<GetGrades />} />
         <Route path="/grades/update/:id" element={<UpdateGrade />} />
         <Route path="/subjects/create" element={<CreateSubject />} />
         <Route path="/subjects" element={<GetSubjects />} />

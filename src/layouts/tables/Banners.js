@@ -33,6 +33,7 @@ function Banners() {
     position: "Header",
     isActive: true,
     isDeleted: false,
+    banner_url: null, // Initialize banner_url as null
   });
   const [modalKey, setModalKey] = useState(0); // Key to force reset the modal
 
@@ -77,7 +78,7 @@ function Banners() {
         setOpenModal(false);
         setNewBanner({
           banner_type: "image",
-          banner_url: "",
+          banner_url: null,
           screen_time: 40,
           position: "Header",
           isActive: true,
@@ -95,16 +96,31 @@ function Banners() {
 
   const handleUpdateBanner = async () => {
     try {
+      const formData = new FormData();
+      formData.append('banner_type', newBanner.banner_type);
+      formData.append('screen_time', newBanner.screen_time);
+      formData.append('position', newBanner.position);
+      formData.append('isActive', newBanner.isActive ? "TRUE" : "FALSE");
+      if (newBanner.banner_url) {
+        formData.append('banner', newBanner.banner_url);
+      }
+
       const response = await axios.put(
         `https://bluecollar.sndktech.online/api/banners/update/${newBanner.id}`,
-        newBanner
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
+
       if (response.status === 200) {
         setBanners(banners.map(b => b.id === newBanner.id ? response.data : b));
         setOpenModal(false);
         setNewBanner({
           banner_type: "image",
-          banner_url: "",
+          banner_url: null,
           screen_time: 40,
           position: "Header",
           isActive: true,
@@ -154,7 +170,7 @@ function Banners() {
   const resetForm = () => {
     setNewBanner({
       banner_type: "image",
-      banner_url: "",
+      banner_url: null,
       screen_time: 40,
       position: "Header",
       isActive: true,

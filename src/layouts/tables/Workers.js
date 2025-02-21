@@ -41,9 +41,11 @@ function Workers() {
     service_charge: 0,
     category_id: null,
     services: [],
-    available_slots: [], // Ensure this is initialized as an empty array
+    available_slots: [],
     vendor_id: null,
   });
+  const [categories, setCategories] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [servicesOptions, setServicesOptions] = useState([
     "plumber", "electric", "cleaning", "furniture", "wiring", "Car Repairing", "Bike Repairing", "cleaner"
   ]);
@@ -69,6 +71,44 @@ function Workers() {
     };
 
     fetchWorkers();
+  }, []);
+
+  // Fetch categories data
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("https://bluecollar.sndktech.online/api/categories");
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        alert("Failed to fetch categories. Please check your network connection and try again.");
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch vendors data
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const response = await fetch("https://bluecollar.sndktech.online/api/signup/users/list/vendor");
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setVendors(data.data);
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+        alert("Failed to fetch vendors. Please check your network connection and try again.");
+      }
+    };
+
+    fetchVendors();
   }, []);
 
   const handleCreateWorker = async () => {
@@ -213,7 +253,7 @@ function Workers() {
     if (worker) {
       setNewWorker({
         ...worker,
-        available_slots: worker.available_slots || [], // Ensure available_slots is an array
+        available_slots: worker.available_slots || [],
       });
     } else {
       setNewWorker({
@@ -282,26 +322,14 @@ function Workers() {
       Header: "Actions",
       accessor: "actions",
       Cell: ({ row }) => (
-        <>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setNewWorker(row.original);
-              setOpenModal(true);
-            }}
-          >
-            Edit
-          </Button> */}
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => handleDeleteWorker(row.original.id)}
-            sx={{ marginLeft: 1 }}
-          >
-            Delete
-          </Button>
-        </>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => handleDeleteWorker(row.original.id)}
+          sx={{ marginLeft: 1 }}
+        >
+          Delete
+        </Button>
       ),
     },
   ];
@@ -367,24 +395,38 @@ function Workers() {
             onChange={handleInputChange}
             margin="normal"
           />
-          <TextField
-            label="Category ID"
-            fullWidth
-            name="category_id"
-            type="number"
-            value={newWorker.category_id}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Vendor ID"
-            fullWidth
-            name="vendor_id"
-            type="number"
-            value={newWorker.vendor_id}
-            onChange={handleInputChange}
-            margin="normal"
-          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="category-select-label">Category</InputLabel>
+            <Select
+              labelId="category-select-label"
+              id="category-select"
+              value={newWorker.category_id}
+              onChange={(e) => setNewWorker({ ...newWorker, category_id: e.target.value })}
+              label="Category"
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.category_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="vendor-select-label">Vendor</InputLabel>
+            <Select
+              labelId="vendor-select-label"
+              id="vendor-select"
+              value={newWorker.vendor_id}
+              onChange={(e) => setNewWorker({ ...newWorker, vendor_id: e.target.value })}
+              label="Vendor"
+            >
+              {vendors.map((vendor) => (
+                <MenuItem key={vendor.id} value={vendor.id}>
+                  {vendor.full_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Autocomplete
             multiple
             options={servicesOptions}
@@ -400,67 +442,6 @@ function Workers() {
               />
             )}
           />
-          {/* <Box sx={{ mt: 2 }}>
-            <Typography variant="h6">Available Slots</Typography>
-            {(newWorker.available_slots || []).map((slot, index) => ( // Ensure available_slots is an array
-              <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <TextField
-                  label="Date"
-                  fullWidth
-                  name={`available_slots[${index}].date`}
-                  type="date"
-                  value={slot.date || ''}
-                  onChange={(e) => {
-                    const newSlots = [...newWorker.available_slots];
-                    newSlots[index].date = e.target.value;
-                    setNewWorker({ ...newWorker, available_slots: newSlots });
-                  }}
-                  margin="normal"
-                />
-                <TextField
-                  label="Start Time"
-                  fullWidth
-                  name={`available_slots[${index}].startTime`}
-                  type="time"
-                  value={slot.startTime || ''}
-                  onChange={(e) => {
-                    const newSlots = [...newWorker.available_slots];
-                    newSlots[index].startTime = e.target.value;
-                    setNewWorker({ ...newWorker, available_slots: newSlots });
-                  }}
-                  margin="normal"
-                />
-                <TextField
-                  label="End Time"
-                  fullWidth
-                  name={`available_slots[${index}].endTime`}
-                  type="time"
-                  value={slot.endTime || ''}
-                  onChange={(e) => {
-                    const newSlots = [...newWorker.available_slots];
-                    newSlots[index].endTime = e.target.value;
-                    setNewWorker({ ...newWorker, available_slots: newSlots });
-                  }}
-                  margin="normal"
-                />
-                <IconButton onClick={() => {
-                  const newSlots = [...newWorker.available_slots];
-                  newSlots.splice(index, 1);
-                  setNewWorker({ ...newWorker, available_slots: newSlots });
-                }}>
-                  <Typography variant="body2" color="error">
-                    Remove
-                  </Typography>
-                </IconButton>
-              </Box>
-            ))}
-            <Button variant="contained" color="primary" onClick={() => {
-              const newSlots = [...newWorker.available_slots, { date: '', startTime: '', endTime: '' }];
-              setNewWorker({ ...newWorker, available_slots: newSlots });
-            }}>
-              Add Slot
-            </Button>
-          </Box> */}
           <input
             type="file"
             name="image"
