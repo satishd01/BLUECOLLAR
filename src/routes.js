@@ -69,6 +69,7 @@ import PostRequests from "layouts/tables/PostedJobs";
 import NEWDashboard from "layouts/dashboard/New-dasbord";
 import Orders from "layouts/tables/Orders";
 import GovernmentJobs from "layouts/tables/Govtjobs";
+import GovernmentJobApplications from "layouts/tables/Jobapplications";
 
 const routes = [
   {
@@ -182,6 +183,19 @@ const routes = [
       </i>
     ), // Icon for schools
     component: < GovernmentJobs/>, // The component to render
+    layout: "/admin",
+  },
+  {
+    type: "collapse",
+    name: "Apllications", // Adding the Schools menu item
+    key: "Apllications",
+    route: "/Applications",
+    icon: (
+      <i className="material-icons" style={{ color: "white" }}>
+        school
+      </i>
+    ), // Icon for schools
+    component: < GovernmentJobApplications/>, // The component to render
     layout: "/admin",
   },
 

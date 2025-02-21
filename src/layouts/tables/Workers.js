@@ -160,6 +160,9 @@ function Workers() {
     }
   };
 
+
+
+  
   const handleUpdateWorker = async () => {
     try {
       const formData = new FormData();
@@ -403,6 +406,7 @@ function Workers() {
               value={newWorker.category_id}
               onChange={(e) => setNewWorker({ ...newWorker, category_id: e.target.value })}
               label="Category"
+              sx={{ padding: "12px 14px" }}
             >
               {categories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>
@@ -419,6 +423,7 @@ function Workers() {
               value={newWorker.vendor_id}
               onChange={(e) => setNewWorker({ ...newWorker, vendor_id: e.target.value })}
               label="Vendor"
+              sx={{ padding: "12px 14px" }}
             >
               {vendors.map((vendor) => (
                 <MenuItem key={vendor.id} value={vendor.id}>
