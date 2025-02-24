@@ -28,6 +28,7 @@ function Vendors() {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [openAadhaarModal, setOpenAadhaarModal] = useState(false);
   const [newVendor, setNewVendor] = useState({
     full_name: "",
     email: "",
@@ -45,8 +46,10 @@ function Vendors() {
     name_as_per_bank_details: "",
     account_number: "",
     ifsc_code: "",
-    photo: null, // Added to handle file uploads
-    user_id: "", // Added to handle user_id
+    photo: null,
+    user_id: "",
+    aadhaar_front: "",
+    aadhaar_back: "",
   });
 
   // Helper function to convert date format
@@ -76,7 +79,7 @@ function Vendors() {
           setVendors(data.data.map(vendor => ({
             ...vendor,
             dob: formatDate(vendor.dob), // Convert date format
-          })).reverse());
+          })));
         }
       } catch (error) {
         console.error("Error fetching vendor data:", error);
@@ -91,16 +94,39 @@ function Vendors() {
 
   const handleCreateVendor = async () => {
     try {
+      const formData = new FormData();
+      formData.append('full_name', newVendor.full_name);
+      formData.append('email', newVendor.email);
+      formData.append('password', newVendor.password);
+      formData.append('phone_number', newVendor.phone_number);
+      formData.append('gender', newVendor.gender);
+      formData.append('dob', newVendor.dob);
+      formData.append('age', newVendor.age);
+      formData.append('aadhar_card_number', newVendor.aadhar_card_number);
+      formData.append('pancard_number', newVendor.pancard_number);
+      formData.append('flat_no', newVendor.flat_no);
+      formData.append('landmark', newVendor.landmark);
+      formData.append('city', newVendor.city);
+      formData.append('pincode', newVendor.pincode);
+      formData.append('name_as_per_bank_details', newVendor.name_as_per_bank_details);
+      formData.append('account_number', newVendor.account_number);
+      formData.append('ifsc_code', newVendor.ifsc_code);
+      formData.append('aadhaar_front', newVendor.aadhaar_front);
+      formData.append('aadhaar_back', newVendor.aadhaar_back);
+      if (newVendor.photo) {
+        formData.append('photo', newVendor.photo);
+      }
+
       const response = await fetch("https://bluecollar.sndktech.online/api/signup/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newVendor),
+        body: formData,
       });
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const result = await response.json();
 
+      const result = await response.json();
       if (response.ok) {
         setVendors((prev) => [
           ...prev,
@@ -129,6 +155,8 @@ function Vendors() {
           ifsc_code: "",
           photo: null,
           user_id: "",
+          aadhaar_front: "",
+          aadhaar_back: "",
         });
         alert("Vendor created successfully!");
       } else {
@@ -143,29 +171,27 @@ function Vendors() {
   const handleUpdateVendor = async () => {
     try {
       const formData = new FormData();
-
-      // Append all fields to the FormData object
       formData.append('full_name', newVendor.full_name);
+      formData.append('email', newVendor.email);
       formData.append('phone_number', newVendor.phone_number);
+      formData.append('gender', newVendor.gender);
       formData.append('dob', newVendor.dob);
       formData.append('age', newVendor.age);
       formData.append('aadhar_card_number', newVendor.aadhar_card_number);
       formData.append('pancard_number', newVendor.pancard_number);
+      formData.append('flat_no', newVendor.flat_no);
       formData.append('landmark', newVendor.landmark);
       formData.append('city', newVendor.city);
       formData.append('pincode', newVendor.pincode);
       formData.append('name_as_per_bank_details', newVendor.name_as_per_bank_details);
       formData.append('account_number', newVendor.account_number);
       formData.append('ifsc_code', newVendor.ifsc_code);
-      formData.append('gender', newVendor.gender);
-      formData.append('flat_no', newVendor.flat_no);
-
-      // Append the photo file if it exists
+      formData.append('aadhaar_front', newVendor.aadhaar_front);
+      formData.append('aadhaar_back', newVendor.aadhaar_back);
       if (newVendor.photo) {
         formData.append('photo', newVendor.photo);
       }
 
-      // Send the PUT request with FormData
       const response = await fetch(
         `https://bluecollar.sndktech.online/api/vendors/${newVendor.user_id}`,
         {
@@ -179,16 +205,12 @@ function Vendors() {
       }
 
       const result = await response.json();
-
       if (response.ok) {
-        // Update the vendors list with the updated vendor data
         setVendors((prevVendors) =>
           prevVendors.map((vendor) =>
             vendor.id === newVendor.id ? { ...vendor, ...newVendor, dob: formatDate(newVendor.dob) } : vendor
           )
         );
-
-        // Close the modal and reset the form
         setOpenModal(false);
         setNewVendor({
           full_name: "",
@@ -209,8 +231,9 @@ function Vendors() {
           ifsc_code: "",
           photo: null,
           user_id: "",
+          aadhaar_front: "",
+          aadhaar_back: "",
         });
-
         alert("Vendor updated successfully!");
       } else {
         alert(result.error || "Failed to update vendor");
@@ -235,7 +258,6 @@ function Vendors() {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-
         if (result.success) {
           setVendors((prevVendors) =>
             prevVendors.filter((vendor) => vendor.id !== vendorId)
@@ -285,9 +307,19 @@ function Vendors() {
         ifsc_code: "",
         photo: null,
         user_id: "",
+        aadhaar_front: "",
+        aadhaar_back: "",
       });
     }
     setOpenModal(true);
+  };
+
+  const handleOpenAadhaarModal = (vendor) => {
+    setNewVendor({
+      ...vendor,
+      dob: formatDate(vendor.dob), // Ensure date is in the correct format
+    });
+    setOpenAadhaarModal(true);
   };
 
   if (loading) {
@@ -321,13 +353,6 @@ function Vendors() {
     { Header: "Age", accessor: "age" },
     { Header: "Aadhar Card", accessor: "aadhar_card_number" },
     { Header: "Pancard", accessor: "pancard_number" },
-    { Header: "Flat No", accessor: "flat_no" },
-    { Header: "Landmark", accessor: "landmark" },
-    { Header: "City", accessor: "city" },
-    { Header: "Pincode", accessor: "pincode" },
-    { Header: "Bank Name", accessor: "name_as_per_bank_details" },
-    { Header: "Account Number", accessor: "account_number" },
-    { Header: "IFSC Code", accessor: "ifsc_code" },
     {
       Header: "Actions",
       accessor: "actions",
@@ -352,6 +377,20 @@ function Vendors() {
             Delete
           </Button>
         </>
+      ),
+    },
+    {
+      Header: "View Aadhaar",
+      accessor: "view_aadhaar",
+      Cell: ({ row }) => (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpenAadhaarModal(row.original)}
+          sx={{ marginLeft: 1 }}
+        >
+          View Aadhaar
+        </Button>
       ),
     },
   ];
@@ -381,7 +420,7 @@ function Vendors() {
 
       {/* Modal for creating or editing vendor */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>{newVendor.id ? "Edit Vendor" : "Create Vendor"}</DialogTitle>
+        <DialogTitle>{newVendor.user_id ? "Edit Vendor" : "Create Vendor"}</DialogTitle>
         <DialogContent>
           <TextField
             label="Full Name"
@@ -447,62 +486,6 @@ function Vendors() {
             onChange={handleInputChange}
             margin="normal"
           />
-          <TextField
-            label="Flat No"
-            fullWidth
-            name="flat_no"
-            value={newVendor.flat_no}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Landmark"
-            fullWidth
-            name="landmark"
-            value={newVendor.landmark}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="City"
-            fullWidth
-            name="city"
-            value={newVendor.city}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Pincode"
-            fullWidth
-            name="pincode"
-            value={newVendor.pincode}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Bank Name"
-            fullWidth
-            name="name_as_per_bank_details"
-            value={newVendor.name_as_per_bank_details}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Account Number"
-            fullWidth
-            name="account_number"
-            value={newVendor.account_number}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="IFSC Code"
-            fullWidth
-            name="ifsc_code"
-            value={newVendor.ifsc_code}
-            onChange={handleInputChange}
-            margin="normal"
-          />
           <input
             type="file"
             name="photo"
@@ -515,6 +498,32 @@ function Vendors() {
           </Button>
           <Button onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} color="primary">
             {newVendor.user_id ? "Update" : "Create"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal for viewing Aadhaar card images */}
+      <Dialog open={openAadhaarModal} onClose={() => setOpenAadhaarModal(false)}>
+        <DialogTitle>View Aadhaar Card</DialogTitle>
+        <DialogContent>
+          {newVendor.aadhaar_front && (
+            <img
+              src={newVendor.aadhaar_front}
+              alt="Aadhaar Front"
+              style={{ width: '100%', height: 'auto', margin: '1rem 0' }}
+            />
+          )}
+          {newVendor.aadhaar_back && (
+            <img
+              src={newVendor.aadhaar_back}
+              alt="Aadhaar Back"
+              style={{ width: '100%', height: 'auto', margin: '1rem 0' }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAadhaarModal(false)} color="primary">
+            Close
           </Button>
         </DialogActions>
       </Dialog>
