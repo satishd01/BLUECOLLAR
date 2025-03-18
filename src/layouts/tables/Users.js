@@ -219,7 +219,7 @@ function Users() {
         <>
           <Button
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => {
               setNewUser(row.original);
               setOpenModal(true);

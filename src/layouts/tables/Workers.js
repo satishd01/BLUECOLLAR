@@ -51,63 +51,57 @@ function Workers() {
   ]);
 
   // Fetch workers data
-  useEffect(() => {
-    const fetchWorkers = async () => {
-      try {
-        const response = await fetch("https://bluecollar.sndktech.online/worker/list");
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        if (data && data.totalWorkers) {
-          setWorkers(data.workers);
-        }
-      } catch (error) {
-        console.error("Error fetching workers:", error);
-        alert("Failed to fetch workers. Please check your network connection and try again.");
-      } finally {
-        setLoading(false);
+  const fetchWorkers = async () => {
+    try {
+      const response = await fetch("https://bluecollar.sndktech.online/worker/list");
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
-
-    fetchWorkers();
-  }, []);
+      const data = await response.json();
+      if (data && data.totalWorkers) {
+        setWorkers(data.workers);
+      }
+    } catch (error) {
+      console.error("Error fetching workers:", error);
+      alert("Failed to fetch workers. Please check your network connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch categories data
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("https://bluecollar.sndktech.online/api/categories");
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        alert("Failed to fetch categories. Please check your network connection and try again.");
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("https://bluecollar.sndktech.online/api/categories");
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
-
-    fetchCategories();
-  }, []);
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      alert("Failed to fetch categories. Please check your network connection and try again.");
+    }
+  };
 
   // Fetch vendors data
-  useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const response = await fetch("https://bluecollar.sndktech.online/api/signup/users/list/vendor");
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setVendors(data.data);
-      } catch (error) {
-        console.error("Error fetching vendors:", error);
-        alert("Failed to fetch vendors. Please check your network connection and try again.");
+  const fetchVendors = async () => {
+    try {
+      const response = await fetch("https://bluecollar.sndktech.online/api/signup/users/list/vendor");
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const data = await response.json();
+      setVendors(data.data);
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+      alert("Failed to fetch vendors. Please check your network connection and try again.");
+    }
+  };
 
+  useEffect(() => {
+    fetchWorkers();
+    fetchCategories();
     fetchVendors();
   }, []);
 
@@ -134,12 +128,8 @@ function Workers() {
       const result = await response.json();
 
       if (response.ok) {
-        setWorkers((prev) => [
-          ...prev,
-          {
-            ...result.data,
-          },
-        ]);
+        // Re-fetch the workers data
+        fetchWorkers();
         setOpenModal(false);
         setNewWorker({
           name: "",
@@ -160,9 +150,6 @@ function Workers() {
     }
   };
 
-
-
-  
   const handleUpdateWorker = async () => {
     try {
       const formData = new FormData();
@@ -189,11 +176,8 @@ function Workers() {
       const result = await response.json();
 
       if (response.ok) {
-        setWorkers((prevWorkers) =>
-          prevWorkers.map((worker) =>
-            worker.id === newWorker.id ? { ...worker, ...newWorker } : worker
-          )
-        );
+        // Re-fetch the workers data
+        fetchWorkers();
         setOpenModal(false);
         setNewWorker({
           name: "",
@@ -230,9 +214,8 @@ function Workers() {
         const result = await response.json();
 
         if (result.message) {
-          setWorkers((prevWorkers) =>
-            prevWorkers.filter((worker) => worker.id !== workerId)
-          );
+          // Re-fetch the workers data
+          fetchWorkers();
           alert("Worker deleted successfully!");
         } else {
           alert(result.error || "Failed to delete worker");
@@ -360,10 +343,10 @@ function Workers() {
                     position: "absolute",
                     top: 20,
                     right: 20,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "white",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#d32f2f",
+                      backgroundColor: "white",
                     },
                   }}
                   onClick={() => handleOpenModal()}

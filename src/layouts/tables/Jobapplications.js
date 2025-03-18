@@ -41,7 +41,7 @@ function GovernmentJobApplications() {
       }
       const response = await axios.get(url);
       if (response.data) {
-        setApplications(response.data);
+        setApplications(response.data.reverse());
       }
       setLoading(false);
     } catch (error) {

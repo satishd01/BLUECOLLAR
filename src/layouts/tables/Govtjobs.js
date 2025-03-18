@@ -40,10 +40,6 @@ function GovernmentJobs() {
   });
   const [modalKey, setModalKey] = useState(0); // Key to force reset the modal
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
   const fetchJobs = async () => {
     try {
       const response = await axios.get("https://bluecollar.sndktech.online/api/govt-jobs/list");
@@ -58,6 +54,10 @@ function GovernmentJobs() {
     }
   };
 
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
   const handleCreateJob = async () => {
     try {
       const response = await axios.post(
@@ -65,7 +65,6 @@ function GovernmentJobs() {
         newJob
       );
       if (response.status === 201) {
-        setJobs([...jobs, response.data]);
         setOpenModal(false);
         setNewJob({
           job_type: "",
@@ -78,8 +77,8 @@ function GovernmentJobs() {
           about_company: "",
           about_job: "",
         });
-        setModalKey(prevKey => prevKey + 1); 
         alert("Job created successfully!");
+        fetchJobs(); // Re-fetch jobs after creation
       } else {
         alert(response.data.error || "Failed to create job");
       }
@@ -100,7 +99,6 @@ function GovernmentJobs() {
         updatedJob
       );
       if (response.status === 200) {
-        setJobs(jobs.map(job => job.id === newJob.id ? response.data : job));
         setOpenModal(false);
         setNewJob({
           job_type: "",
@@ -113,8 +111,8 @@ function GovernmentJobs() {
           about_company: "",
           about_job: "",
         });
-        setModalKey(prevKey => prevKey + 1); // Reset the modal
         alert("Job updated successfully!");
+        fetchJobs(); // Re-fetch jobs after update
       } else {
         alert(response.data.error || "Failed to update job");
       }
@@ -130,8 +128,8 @@ function GovernmentJobs() {
           `https://bluecollar.sndktech.online/api/govt-jobs/${id}`
         );
         if (response.status === 200) {
-          setJobs(jobs.filter(job => job.id !== id));
           alert("Job deleted successfully!");
+          fetchJobs(); // Re-fetch jobs after deletion
         }
       } catch (error) {
         alert("Error deleting job. Please check your network connection and try again.");
@@ -140,11 +138,7 @@ function GovernmentJobs() {
   };
 
   const handleInputChange = (e) => {
-    if (e.target.name === 'last_date') {
-      setNewJob({ ...newJob, [e.target.name]: e.target.value });
-    } else {
-      setNewJob({ ...newJob, [e.target.name]: e.target.value });
-    }
+    setNewJob({ ...newJob, [e.target.name]: e.target.value });
   };
 
   const formatDate = (date) => {
@@ -191,7 +185,7 @@ function GovernmentJobs() {
         <>
           <Button
             variant="contained"
-            color="primary"
+            color="white"
             onClick={() => {
               setNewJob({
                 ...row.original,
@@ -233,9 +227,9 @@ function GovernmentJobs() {
                     position: "absolute",
                     top: 20,
                     right: 20,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "white",
                     color: "white",
-                    "&:hover": { backgroundColor: "#d32f2f" }
+                    "&:hover": { backgroundColor: "white" }
                   }}
                   onClick={() => {
                     setNewJob({

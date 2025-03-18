@@ -82,7 +82,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: " Users", // Adding the Students menu item
+    name: " User", // Adding the Students menu item
     key: "Users",
     route: "/users",
     icon: (
@@ -95,7 +95,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: " Vendors", // Adding the Students menu item
+    name: " Vendor", // Adding the Students menu item
     key: "Vendors",
     route: "/vendors",
     icon: (
@@ -121,7 +121,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: " Workers", // Adding the Students menu item
+    name: " Worker", // Adding the Students menu item
     key: "Workers",
     route: "/Workers",
     icon: (
@@ -134,7 +134,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Banners", // Adding the Schools menu item
+    name: "Banner", // Adding the Schools menu item
     key: "Banners",
     route: "/banners",
     icon: (
@@ -148,7 +148,7 @@ const routes = [
   
   {
     type: "collapse",
-    name: "Job-Requests", // Adding the Schools menu item
+    name: "Post-Request", // Adding the Schools menu item
     key: "Job-Requests",
     route: "/Job-requests",
     icon: (
@@ -174,7 +174,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Govt Jobs", // Adding the Schools menu item
+    name: "Job", // Adding the Schools menu item
     key: "Govt Jobs",
     route: "/govt-jobs",
     icon: (
@@ -187,7 +187,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Apllications", // Adding the Schools menu item
+    name: "Job Applications", // Adding the Schools menu item
     key: "Apllications",
     route: "/Applications",
     icon: (

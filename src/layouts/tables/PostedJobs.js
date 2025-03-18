@@ -40,26 +40,25 @@ function PostRequests() {
     attach: null, // Added attach field
   });
 
-  // Fetch post requests data
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch("https://bluecollar.sndktech.online/api/post-requests");
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        if (data && data.totalRequests) {
-          setRequests(data.postRequests);
-        }
-      } catch (error) {
-        console.error("Error fetching post requests:", error);
-        alert("Failed to fetch post requests. Please check your network connection and try again.");
-      } finally {
-        setLoading(false);
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch("https://bluecollar.sndktech.online/api/post-requests");
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const data = await response.json();
+      if (data && data.totalRequests) {
+        setRequests(data.postRequests);
+      }
+    } catch (error) {
+      console.error("Error fetching post requests:", error);
+      alert("Failed to fetch post requests. Please check your network connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchRequests();
   }, []);
 
@@ -87,12 +86,6 @@ function PostRequests() {
       const result = await response.json();
 
       if (response.ok) {
-        setRequests((prev) => [
-          ...prev,
-          {
-            ...result.data,
-          },
-        ]);
         setOpenModal(false);
         setNewRequest({
           service: "",
@@ -105,6 +98,7 @@ function PostRequests() {
           attach: null, // Reset attach field
         });
         alert("Post request created successfully!");
+        fetchRequests(); // Re-fetch requests after creation
       } else {
         alert(result.error || "Failed to create post request");
       }
@@ -121,7 +115,7 @@ function PostRequests() {
       formData.append('location', newRequest.location);
       formData.append('price', newRequest.price);
       formData.append('service_description', newRequest.service_description);
-      formData.append('date', formatDate(newRequest.date)); // Format the date
+      formData.append('date', newRequest.date);
       formData.append('time', newRequest.time);
       formData.append('user_id', newRequest.user_id);
       if (newRequest.attach) {
@@ -141,11 +135,6 @@ function PostRequests() {
       const result = await response.json();
 
       if (response.ok) {
-        setRequests((prevRequests) =>
-          prevRequests.map((request) =>
-            request.id === newRequest.id ? { ...request, ...newRequest } : request
-          )
-        );
         setOpenModal(false);
         setNewRequest({
           service: "",
@@ -158,6 +147,7 @@ function PostRequests() {
           attach: null, // Reset attach field
         });
         alert("Post request updated successfully!");
+        fetchRequests(); // Re-fetch requests after update
       } else {
         alert(result.error || "Failed to update post request");
       }
@@ -165,12 +155,6 @@ function PostRequests() {
       console.error("Error updating post request:", error);
       alert("Failed to update post request. Please check your network connection and try again.");
     }
-  };
-
-  const formatDate = (date) => {
-    if (!date) return "";
-    const [year, month, day] = new Date(date).toISOString().split("T")[0].split("-");
-    return `${year}-${month}-${day}`;
   };
 
   const handleDeleteRequest = async (requestId) => {
@@ -187,12 +171,10 @@ function PostRequests() {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-  
+
         if (result.message) {
-          setRequests((prevRequests) =>
-            prevRequests.filter((request) => request.id !== requestId)
-          );
           alert("Post request deleted successfully!");
+          fetchRequests(); // Re-fetch requests after deletion
         } else {
           alert(result.message || "Failed to delete post request");
         }
@@ -267,7 +249,7 @@ function PostRequests() {
         <>
           <Button
             variant="contained"
-            color="primary"
+            color="white"
             onClick={() => {
               setNewRequest(row.original);
               setOpenModal(true);
@@ -311,10 +293,10 @@ function PostRequests() {
                     position: "absolute",
                     top: 20,
                     right: 20,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "white",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#d32f2f",
+                      backgroundColor: "white",
                     },
                   }}
                   onClick={() => handleOpenModal()}

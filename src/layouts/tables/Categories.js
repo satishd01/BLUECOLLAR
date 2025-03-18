@@ -33,24 +33,25 @@ function Categories() {
     image: null, // Added to handle file uploads
   });
 
-  // Fetch categories data
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("https://bluecollar.sndktech.online/api/categories/");
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        alert("Failed to fetch categories. Please check your network connection and try again.");
-      } finally {
-        setLoading(false);
+  // Define the fetchCategories function at the top level
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("https://bluecollar.sndktech.online/api/categories/");
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      alert("Failed to fetch categories. Please check your network connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Use the fetchCategories function in useEffect
+  useEffect(() => {
     fetchCategories();
   }, []);
 
@@ -72,12 +73,8 @@ function Categories() {
       const result = await response.json();
 
       if (response.ok) {
-        setCategories((prev) => [
-          ...prev,
-          {
-            ...result.data,
-          },
-        ]);
+        // Re-fetch the categories data
+        fetchCategories();
         setOpenModal(false);
         setNewCategory({
           category_name: "",
@@ -85,7 +82,7 @@ function Categories() {
         });
         alert("Category created successfully!");
       } else {
-        alert(result.error || "Failed to create category");
+        alert(result.message);
       }
     } catch (error) {
       console.error("Error creating category:", error);
@@ -139,7 +136,7 @@ function Categories() {
     if (confirmDelete) {
       try {
         const response = await fetch(
-          `https://bluecollar.sndktech.online/api/categories/${categoryId}`,
+          `https://bluecollar.sndktech.online/api/categories/categories/${categoryId}`,
           {
             method: "DELETE",
           }
@@ -149,13 +146,13 @@ function Categories() {
         }
         const result = await response.json();
 
-        if (result.success) {
+        if (result) {
           setCategories((prevCategories) =>
             prevCategories.filter((category) => category.id !== categoryId)
           );
-          alert("Category deleted successfully!");
+          alert(result.message || "Category deleted successfully!");
         } else {
-          alert(result.error || "Failed to delete category");
+          alert(result.message || "Failed to delete category");
         }
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -227,7 +224,7 @@ function Categories() {
         <>
           <Button
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => {
               setNewCategory(row.original);
               setOpenModal(true);
@@ -266,15 +263,15 @@ function Categories() {
                 </MDBox>
                 <Button
                   variant="contained"
-                  color="white"
+                  color="error"
                   sx={{
                     position: "absolute",
                     top: 20,
                     right: 20,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "white",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#d32f2f",
+                      backgroundColor: "white",
                     },
                   }}
                   onClick={() => handleOpenModal()}
@@ -310,7 +307,7 @@ function Categories() {
           <Button onClick={() => setOpenModal(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={newCategory.id ? handleUpdateCategory : handleCreateCategory} color="primary">
+          <Button onClick={newCategory.id ? handleUpdateCategory : handleCreateCategory} color="error">
             {newCategory.id ? "Update" : "Create"}
           </Button>
         </DialogActions>

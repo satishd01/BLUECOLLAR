@@ -35,16 +35,11 @@ function Banners() {
     isDeleted: false,
     banner_url: null, // Initialize banner_url as null
   });
-  const [modalKey, setModalKey] = useState(0); // Key to force reset the modal
-
-  useEffect(() => {
-    fetchBanners();
-  }, []);
 
   const fetchBanners = async () => {
     try {
       const response = await axios.get("https://bluecollar.sndktech.online/api/banners/all/banners");
-      console.log("Banners data:", response);
+      console.log("Banners data:", response.data);
       if (response.data) {
         setBanners(response.data);
       }
@@ -55,6 +50,10 @@ function Banners() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
 
   const handleCreateBanner = async () => {
     try {
@@ -74,7 +73,6 @@ function Banners() {
       });
 
       if (response.status === 201) {
-        setBanners([...banners, response.data]);
         setOpenModal(false);
         setNewBanner({
           banner_type: "image",
@@ -84,8 +82,8 @@ function Banners() {
           isActive: true,
           isDeleted: false,
         });
-        setModalKey(prevKey => prevKey + 1); 
         alert("Banner created successfully!");
+        fetchBanners(); // Re-fetch banners after creation
       } else {
         alert(response.data.error || "Failed to create banner");
       }
@@ -116,7 +114,6 @@ function Banners() {
       );
 
       if (response.status === 200) {
-        setBanners(banners.map(b => b.id === newBanner.id ? response.data : b));
         setOpenModal(false);
         setNewBanner({
           banner_type: "image",
@@ -126,8 +123,8 @@ function Banners() {
           isActive: true,
           isDeleted: false,
         });
-        setModalKey(prevKey => prevKey + 1); // Reset the modal
         alert("Banner updated successfully!");
+        fetchBanners(); // Re-fetch banners after update
       } else {
         alert(response.data.error || "Failed to update banner");
       }
@@ -143,8 +140,8 @@ function Banners() {
           `https://bluecollar.sndktech.online/api/banners/delete/${id}`
         );
         if (response.status === 200) {
-          setBanners(banners.filter(b => b.id !== id));
           alert("Banner deleted successfully!");
+          fetchBanners(); // Re-fetch banners after deletion
         }
       } catch (error) {
         alert("Error deleting banner. Please check your network connection and try again.");
@@ -152,37 +149,11 @@ function Banners() {
     }
   };
 
-  const toggleActiveState = async (id, currentState) => {
-    try {
-      const response = await axios.patch(
-        `https://bluecollar.sndktech.online/api/banners/${id}`,
-        { isActive: !currentState }
-      );
-      if (response.status === 200) {
-        setBanners(banners.map(b => b.id === id ? {...b, isActive: response.data.isActive} : b));
-      }
-    } catch (error) {
-      console.error("Error toggling active state:", error);
-      alert("Error toggling active state. Please check your network connection and try again.");
-    }
-  };
-
-  const resetForm = () => {
-    setNewBanner({
-      banner_type: "image",
-      banner_url: null,
-      screen_time: 40,
-      position: "Header",
-      isActive: true,
-      isDeleted: false,
-    });
-  };
-
   const handleInputChange = (e) => {
     if (e.target.name === 'banner_url' && e.target.files) {
-      setNewBanner({...newBanner, [e.target.name]: e.target.files[0]});
+      setNewBanner({ ...newBanner, [e.target.name]: e.target.files[0] });
     } else {
-      setNewBanner({...newBanner, [e.target.name]: e.target.value});
+      setNewBanner({ ...newBanner, [e.target.name]: e.target.value });
     }
   };
 
@@ -222,25 +193,6 @@ function Banners() {
     },
     { Header: "Screen Time", accessor: "screen_time" },
     { Header: "Position", accessor: "position" },
-    {
-      Header: "Active",
-      accessor: "isActive",
-      Cell: ({ row }) => (
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: row.original.isActive ? "#4CAF50" : "#F44336",
-            color: "white",
-            "&:hover": {
-              backgroundColor: row.original.isActive ? "#388E3C" : "#D32F2F",
-            },
-          }}
-          onClick={() => toggleActiveState(row.original.id, row.original.isActive)}
-        >
-          {row.original.isActive ? "Active" : "Inactive"}
-        </Button>
-      ),
-    },
     {
       Header: "Actions",
       accessor: "actions",
@@ -287,13 +239,19 @@ function Banners() {
                     position: "absolute",
                     top: 20,
                     right: 20,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "white",
                     color: "white",
-                    "&:hover": { backgroundColor: "#d32f2f" }
+                    "&:hover": { backgroundColor: "white" }
                   }}
                   onClick={() => {
-                    resetForm();
-                    setModalKey(prevKey => prevKey + 1); // Reset the modal
+                    setNewBanner({
+                      banner_type: "image",
+                      banner_url: null,
+                      screen_time: 40,
+                      position: "Header",
+                      isActive: true,
+                      isDeleted: false,
+                    });
                     setOpenModal(true);
                   }}
                 >
@@ -316,18 +274,20 @@ function Banners() {
         </Grid>
       </MDBox>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} key={modalKey}>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
         <DialogTitle>{newBanner.id ? "Edit Banner" : "Create Banner"}</DialogTitle>
         <DialogContent>
           <TextField
-            fullWidth margin="normal"
+            fullWidth
+            margin="normal"
             label="Banner URL"
             name="banner_url"
             type="file"
             onChange={handleInputChange}
           />
           <TextField
-            fullWidth margin="normal"
+            fullWidth
+            margin="normal"
             label="Screen Time"
             type="number"
             name="screen_time"
@@ -347,7 +307,7 @@ function Banners() {
             </Select>
           </FormControl>
           <FormControlLabel
-            control={<Switch checked={newBanner.isActive} onChange={(e) => setNewBanner({...newBanner, isActive: e.target.checked})} />}
+            control={<Switch checked={newBanner.isActive} onChange={(e) => setNewBanner({ ...newBanner, isActive: e.target.checked })} />}
             label="Is Active"
           />
         </DialogContent>

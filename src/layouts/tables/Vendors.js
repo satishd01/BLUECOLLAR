@@ -360,7 +360,7 @@ function Vendors() {
         <>
           <Button
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => {
               setNewVendor(row.original);
               setOpenModal(true);
@@ -385,7 +385,7 @@ function Vendors() {
       Cell: ({ row }) => (
         <Button
           variant="contained"
-          color="primary"
+          color="error"
           onClick={() => handleOpenAadhaarModal(row.original)}
           sx={{ marginLeft: 1 }}
         >
@@ -493,10 +493,10 @@ function Vendors() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenModal(false)} color="primary">
+          <Button onClick={() => setOpenModal(false)} color="error">
             Cancel
           </Button>
-          <Button onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} color="primary">
+          <Button onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} color="error">
             {newVendor.user_id ? "Update" : "Create"}
           </Button>
         </DialogActions>
