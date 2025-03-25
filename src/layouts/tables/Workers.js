@@ -301,7 +301,11 @@ function Workers() {
       Header: "Services",
       accessor: "services",
       Cell: ({ row }) => (
-        <span>{row.original.services.join(', ')}</span>
+        <span>
+          {row.original.services
+            .map((service) => service.service_name)  // Map over services and get the service_name
+            .join(", ")}  // Join them with a comma and space
+        </span>
       ),
     },
     {
