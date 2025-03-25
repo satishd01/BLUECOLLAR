@@ -304,7 +304,7 @@ function Workers() {
         <span>
           {row.original.services
             .map((service) => service.service_name)  // Map over services and get the service_name
-            .join(", ")}  // Join them with a comma and space
+            .join(", ")}  
         </span>
       ),
     },
