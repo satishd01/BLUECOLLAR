@@ -264,7 +264,7 @@ function Vendors() {
           );
           alert("Vendor deleted successfully!");
         } else {
-          alert(result.error || "Failed to delete vendor");
+          alert(result.message || "Failed to delete vendor");
         }
       } catch (error) {
         console.error("Error deleting vendor:", error);
@@ -371,7 +371,7 @@ function Vendors() {
           <Button
             variant="contained"
             color="error"
-            onClick={() => handleDeleteVendor(row.original.id)}
+            onClick={() => handleDeleteVendor(row.original.user_id)}
             sx={{ marginLeft: 1 }}
           >
             Delete

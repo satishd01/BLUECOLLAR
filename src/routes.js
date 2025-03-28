@@ -70,6 +70,7 @@ import NEWDashboard from "layouts/dashboard/New-dasbord";
 import Orders from "layouts/tables/Orders";
 import GovernmentJobs from "layouts/tables/Govtjobs";
 import GovernmentJobApplications from "layouts/tables/Jobapplications";
+import Blogs from "layouts/tables/blog";
 
 const routes = [
   {
@@ -196,6 +197,19 @@ const routes = [
       </i>
     ), // Icon for schools
     component: < GovernmentJobApplications/>, // The component to render
+    layout: "/admin",
+  },
+  {
+    type: "collapse",
+    name: "blog", // Adding the Schools menu item
+    key: "blog",
+    route: "/blog",
+    icon: (
+      <i className="material-icons" style={{ color: "white" }}>
+        school
+      </i>
+    ), // Icon for schools
+    component: < Blogs/>, // The component to render
     layout: "/admin",
   },
 

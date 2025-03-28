@@ -9,10 +9,13 @@ import {
   Select,
   InputLabel,
   FormControl,
+  IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 // BLISSIQ ADMIN React components
 import MDBox from "components/MDBox";
@@ -57,6 +60,35 @@ function Users() {
 
     fetchUsers();
   }, []);
+
+  const handleVerifyUser = async (userId) => {
+    try {
+      const response = await fetch(`https://bluecollar.sndktech.online/api/signup/verify/user/${userId}`, {
+        method: "POST",
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Update the user's verification status in the local state
+        setUsers(prevUsers => 
+          prevUsers.map(user => 
+            user.user_id === userId ? { ...user, isVerify: 1 } : user
+          )
+        );
+        alert("User verified successfully!");
+      } else {
+        alert(result.error || "Failed to verify user");
+      }
+    } catch (error) {
+      console.error("Error verifying user:", error);
+      alert("Failed to verify user. Please check your network connection and try again.");
+    }
+  };
 
   const handleCreateUser = async () => {
     try {
@@ -212,6 +244,22 @@ function Users() {
     { Header: "Email", accessor: "email" },
     { Header: "Phone", accessor: "phone_number" },
     { Header: "User ID", accessor: "user_id" },
+    { 
+      Header: "Verified", 
+      accessor: "isVerify",
+      Cell: ({ row }) => (
+        <IconButton 
+          onClick={() => !row.original.isVerify && handleVerifyUser(row.original.user_id)}
+          color={row.original.isVerify ? "success" : "default"}
+        >
+          {row.original.isVerify ? (
+            <CheckCircleIcon color="success" />
+          ) : (
+            <RadioButtonUncheckedIcon />
+          )}
+        </IconButton>
+      )
+    },
     {
       Header: "Actions",
       accessor: "actions",
@@ -230,7 +278,7 @@ function Users() {
           <Button
             variant="contained"
             color="error"
-            onClick={() => handleDeleteUser(row.original.user_id)} // Pass user_id
+            onClick={() => handleDeleteUser(row.original.user_id)}
             sx={{ marginLeft: 1 }}
           >
             Delete
@@ -251,6 +299,14 @@ function Users() {
                 <MDTypography variant="h6" color="white">
                   Users Table
                 </MDTypography>
+                <Button 
+                  variant="contained" 
+                  color="error" 
+                  onClick={() => handleOpenModal()}
+                  sx={{ marginLeft: 'auto' }}
+                >
+                  Create User
+                </Button>
               </MDBox>
               <MDBox pt={3} sx={{ display: "flex", flexDirection: "column", height: "400px" }}>
                 <MDBox sx={{ flex: 1, overflow: "auto" }}>
