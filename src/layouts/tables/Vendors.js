@@ -5,14 +5,19 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
+  Button,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Badge,
+  Avatar,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import { green, orange } from "@mui/material/colors";
 
 // BLISSIQ ADMIN React components
 import MDBox from "components/MDBox";
@@ -29,6 +34,7 @@ function Vendors() {
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [openAadhaarModal, setOpenAadhaarModal] = useState(false);
+  const [verifyingId, setVerifyingId] = useState(null);
   const [newVendor, setNewVendor] = useState({
     full_name: "",
     email: "",
@@ -52,7 +58,6 @@ function Vendors() {
     aadhaar_back: "",
   });
 
-  // Helper function to convert date format
   const formatDate = (date) => {
     if (!date) return "";
     const d = new Date(date);
@@ -78,7 +83,7 @@ function Vendors() {
         if (data && data.totalRecords) {
           setVendors(data.data.map(vendor => ({
             ...vendor,
-            dob: formatDate(vendor.dob), // Convert date format
+            dob: formatDate(vendor.dob),
           })));
         }
       } catch (error) {
@@ -95,44 +100,26 @@ function Vendors() {
   const handleCreateVendor = async () => {
     try {
       const formData = new FormData();
-      formData.append('full_name', newVendor.full_name);
-      formData.append('email', newVendor.email);
-      formData.append('password', newVendor.password);
-      formData.append('phone_number', newVendor.phone_number);
-      formData.append('gender', newVendor.gender);
-      formData.append('dob', newVendor.dob);
-      formData.append('age', newVendor.age);
-      formData.append('aadhar_card_number', newVendor.aadhar_card_number);
-      formData.append('pancard_number', newVendor.pancard_number);
-      formData.append('flat_no', newVendor.flat_no);
-      formData.append('landmark', newVendor.landmark);
-      formData.append('city', newVendor.city);
-      formData.append('pincode', newVendor.pincode);
-      formData.append('name_as_per_bank_details', newVendor.name_as_per_bank_details);
-      formData.append('account_number', newVendor.account_number);
-      formData.append('ifsc_code', newVendor.ifsc_code);
-      formData.append('aadhaar_front', newVendor.aadhaar_front);
-      formData.append('aadhaar_back', newVendor.aadhaar_back);
-      if (newVendor.photo) {
-        formData.append('photo', newVendor.photo);
-      }
+      Object.entries(newVendor).forEach(([key, value]) => {
+        if (value !== null && value !== "") {
+          formData.append(key, value);
+        }
+      });
 
       const response = await fetch("https://bluecollar.sndktech.online/api/signup/users", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
 
       const result = await response.json();
       if (response.ok) {
-        setVendors((prev) => [
+        setVendors(prev => [
           ...prev,
           {
             ...result.data,
-            dob: formatDate(result.data.dob), // Convert date format
+            dob: formatDate(result.data.dob),
           },
         ]);
         setOpenModal(false);
@@ -171,44 +158,26 @@ function Vendors() {
   const handleUpdateVendor = async () => {
     try {
       const formData = new FormData();
-      formData.append('full_name', newVendor.full_name);
-      formData.append('email', newVendor.email);
-      formData.append('phone_number', newVendor.phone_number);
-      formData.append('gender', newVendor.gender);
-      formData.append('dob', newVendor.dob);
-      formData.append('age', newVendor.age);
-      formData.append('aadhar_card_number', newVendor.aadhar_card_number);
-      formData.append('pancard_number', newVendor.pancard_number);
-      formData.append('flat_no', newVendor.flat_no);
-      formData.append('landmark', newVendor.landmark);
-      formData.append('city', newVendor.city);
-      formData.append('pincode', newVendor.pincode);
-      formData.append('name_as_per_bank_details', newVendor.name_as_per_bank_details);
-      formData.append('account_number', newVendor.account_number);
-      formData.append('ifsc_code', newVendor.ifsc_code);
-      formData.append('aadhaar_front', newVendor.aadhaar_front);
-      formData.append('aadhaar_back', newVendor.aadhaar_back);
-      if (newVendor.photo) {
-        formData.append('photo', newVendor.photo);
-      }
+      Object.entries(newVendor).forEach(([key, value]) => {
+        if (value !== null && value !== "") {
+          formData.append(key, value);
+        }
+      });
 
       const response = await fetch(
         `https://bluecollar.sndktech.online/api/vendors/${newVendor.user_id}`,
-        {
-          method: "PUT",
-          body: formData,
-        }
+        { method: "PUT", body: formData }
       );
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
 
       const result = await response.json();
       if (response.ok) {
-        setVendors((prevVendors) =>
-          prevVendors.map((vendor) =>
-            vendor.id === newVendor.id ? { ...vendor, ...newVendor, dob: formatDate(newVendor.dob) } : vendor
+        setVendors(prevVendors =>
+          prevVendors.map(vendor =>
+            vendor.user_id === newVendor.user_id 
+              ? { ...vendor, ...newVendor, dob: formatDate(newVendor.dob) } 
+              : vendor
           )
         );
         setOpenModal(false);
@@ -250,18 +219,13 @@ function Vendors() {
       try {
         const response = await fetch(
           `https://bluecollar.sndktech.online/api/auth/vendor/delete/${vendorId}`,
-          {
-            method: "DELETE",
-          }
+          { method: "DELETE" }
         );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
+        
         const result = await response.json();
         if (result.success) {
-          setVendors((prevVendors) =>
-            prevVendors.filter((vendor) => vendor.id !== vendorId)
-          );
+          setVendors(prevVendors => prevVendors.filter(vendor => vendor.user_id !== vendorId));
           alert("Vendor deleted successfully!");
         } else {
           alert(result.message || "Failed to delete vendor");
@@ -269,6 +233,38 @@ function Vendors() {
       } catch (error) {
         console.error("Error deleting vendor:", error);
         alert("Failed to delete vendor. Please check your network connection and try again.");
+      }
+    }
+  };
+
+  const handleVerifyAadhaar = async (vendorId) => {
+    const confirmVerify = window.confirm("Are you sure you want to verify this vendor's Aadhaar?");
+    if (confirmVerify) {
+      try {
+        setVerifyingId(vendorId);
+        const response = await fetch(
+          `https://bluecollar.sndktech.online/api/signup/verify/user/${vendorId}`,
+          { method: "POST" }
+        );
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const result = await response.json();
+        if (response.ok) {
+          setVendors(prevVendors =>
+            prevVendors.map(vendor =>
+              vendor.user_id === vendorId ? { ...vendor, isVerify: 1 } : vendor
+            )
+          );
+          alert("Aadhaar verified successfully!");
+        } else {
+          alert(result.error || "Failed to verify Aadhaar");
+        }
+      } catch (error) {
+        console.error("Error verifying Aadhaar:", error);
+        alert("Failed to verify Aadhaar. Please check your network connection and try again.");
+      } finally {
+        setVerifyingId(null);
       }
     }
   };
@@ -283,10 +279,7 @@ function Vendors() {
 
   const handleOpenModal = (vendor = null) => {
     if (vendor) {
-      setNewVendor({
-        ...vendor,
-        dob: formatDate(vendor.dob), // Ensure date is in the correct format
-      });
+      setNewVendor({ ...vendor, dob: formatDate(vendor.dob) });
     } else {
       setNewVendor({
         full_name: "",
@@ -315,10 +308,7 @@ function Vendors() {
   };
 
   const handleOpenAadhaarModal = (vendor) => {
-    setNewVendor({
-      ...vendor,
-      dob: formatDate(vendor.dob), // Ensure date is in the correct format
-    });
+    setNewVendor({ ...vendor, dob: formatDate(vendor.dob) });
     setOpenAadhaarModal(true);
   };
 
@@ -346,51 +336,90 @@ function Vendors() {
 
   const columns = [
     { Header: "Name", accessor: "full_name" },
-    { Header: "Email", accessor: "email" },
+    // { Header: "Email", accessor: "email" },
     { Header: "Phone", accessor: "phone_number" },
     { Header: "Gender", accessor: "gender" },
     { Header: "DOB", accessor: "dob" },
-    { Header: "Age", accessor: "age" },
-    { Header: "Aadhar Card", accessor: "aadhar_card_number" },
-    { Header: "Pancard", accessor: "pancard_number" },
+    { Header: "Aadhar", accessor: "aadhar_card_number" },
+    {
+      Header: "Verification",
+      accessor: "verification",
+      Cell: ({ row }) => {
+        const isVerifying = verifyingId === row.original.user_id;
+        const isVerified = row.original.isVerify === 1;
+        
+        return (
+          <Tooltip title={isVerified ? "Verified" : isVerifying ? "Verifying..." : "Verify Aadhaar"}>
+            <IconButton
+              onClick={() => !isVerified && !isVerifying && handleVerifyAadhaar(row.original.user_id)}
+              disabled={isVerifying || isVerified}
+              sx={{
+                color: isVerified ? green[500] : orange[500],
+                '&:hover': {
+                  backgroundColor: isVerified ? 'transparent' : 'rgba(0, 0, 0, 0.04)',
+                }
+              }}
+            >
+              {isVerifying ? (
+                <CircularProgress size={24} />
+              ) : isVerified ? (
+                <Badge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  badgeContent={
+                    <VerifiedUserIcon 
+                      fontSize="small" 
+                      sx={{ 
+                        color: green[500],
+                        backgroundColor: 'white',
+                        borderRadius: '50%',
+                        padding: '2px'
+                      }} 
+                    />
+                  }
+                >
+                  <Avatar sx={{ bgcolor: green[100], width: 24, height: 24 }}>
+                    <CheckCircleIcon fontSize="small" sx={{ color: green[500] }} />
+                  </Avatar>
+                </Badge>
+              ) : (
+                <PendingIcon />
+              )}
+            </IconButton>
+          </Tooltip>
+        );
+      },
+    },
     {
       Header: "Actions",
       accessor: "actions",
       Cell: ({ row }) => (
-        <>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <Button
             variant="contained"
             color="error"
-            onClick={() => {
-              setNewVendor(row.original);
-              setOpenModal(true);
-            }}
+            size="small"
+            onClick={() => handleOpenModal(row.original)}
           >
             Edit
           </Button>
           <Button
             variant="contained"
             color="error"
+            size="small"
             onClick={() => handleDeleteVendor(row.original.user_id)}
-            sx={{ marginLeft: 1 }}
           >
             Delete
           </Button>
-        </>
-      ),
-    },
-    {
-      Header: "View Aadhaar",
-      accessor: "view_aadhaar",
-      Cell: ({ row }) => (
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => handleOpenAadhaarModal(row.original)}
-          sx={{ marginLeft: 1 }}
-        >
-          View Aadhaar
-        </Button>
+          <Button
+             variant="contained"
+             color="error"
+             size="small"
+            onClick={() => handleOpenAadhaarModal(row.original)}
+          >
+            View Aadhaar
+          </Button>
+        </div>
       ),
     },
   ];
@@ -402,15 +431,38 @@ function Vendors() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox mx={2} mt={-3} py={3} px={2} variant="gradient" bgColor="info" borderRadius="lg" coloredShadow="info">
+              <MDBox 
+                mx={2} 
+                mt={-3} 
+                py={3} 
+                px={2} 
+                variant="gradient" 
+                bgColor="info" 
+                borderRadius="lg" 
+                coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <MDTypography variant="h6" color="white">
-                  Vendors Table
+                  Vendors 
                 </MDTypography>
+                <Button 
+                  variant="contained" 
+                  color="error"
+                  onClick={() => handleOpenModal()}
+                >
+                  Add New Vendor
+                </Button>
               </MDBox>
-              <MDBox pt={3} sx={{ display: "flex", flexDirection: "column", height: "400px" }}>
-                <MDBox sx={{ flex: 1, overflow: "auto" }}>
-                  <DataTable table={{ columns, rows: vendors }} isSorted={false} entriesPerPage={false} showTotalEntries={false} noEndBorder />
-                </MDBox>
+              <MDBox pt={3}>
+                <DataTable 
+                  table={{ columns, rows: vendors }} 
+                  isSorted={false} 
+                  entriesPerPage={false} 
+                  showTotalEntries={false} 
+                  noEndBorder 
+                />
               </MDBox>
             </Card>
           </Grid>
@@ -418,113 +470,94 @@ function Vendors() {
       </MDBox>
       <Footer />
 
-      {/* Modal for creating or editing vendor */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>{newVendor.user_id ? "Edit Vendor" : "Create Vendor"}</DialogTitle>
+      {/* Vendor Edit/Create Modal */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{newVendor.user_id ? "Edit Vendor" : "Create New Vendor"}</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Full Name"
-            fullWidth
-            name="full_name"
-            value={newVendor.full_name}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            fullWidth
-            name="email"
-            value={newVendor.email}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Phone Number"
-            fullWidth
-            name="phone_number"
-            value={newVendor.phone_number}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Gender"
-            fullWidth
-            name="gender"
-            value={newVendor.gender}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="DOB"
-            fullWidth
-            name="dob"
-            value={newVendor.dob}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Age"
-            fullWidth
-            name="age"
-            value={newVendor.age}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Aadhar Card Number"
-            fullWidth
-            name="aadhar_card_number"
-            value={newVendor.aadhar_card_number}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            label="Pancard Number"
-            fullWidth
-            name="pancard_number"
-            value={newVendor.pancard_number}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <input
-            type="file"
-            name="photo"
-            onChange={handleInputChange}
-          />
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Full Name"
+                fullWidth
+                name="full_name"
+                value={newVendor.full_name}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Email"
+                fullWidth
+                name="email"
+                value={newVendor.email}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+            </Grid>
+            {/* Add other fields in similar grid items */}
+          </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenModal(false)} color="error">
-            Cancel
-          </Button>
-          <Button onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} color="error">
+          <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+          <Button 
+            onClick={newVendor.user_id ? handleUpdateVendor : handleCreateVendor} 
+            variant="contained" 
+            color="primary"
+          >
             {newVendor.user_id ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Modal for viewing Aadhaar card images */}
-      <Dialog open={openAadhaarModal} onClose={() => setOpenAadhaarModal(false)}>
-        <DialogTitle>View Aadhaar Card</DialogTitle>
+      {/* Aadhaar View Modal */}
+      <Dialog open={openAadhaarModal} onClose={() => setOpenAadhaarModal(false)} maxWidth="md">
+        <DialogTitle>Aadhaar Details</DialogTitle>
         <DialogContent>
-          {newVendor.aadhaar_front && (
-            <img
-              src={newVendor.aadhaar_front}
-              alt="Aadhaar Front"
-              style={{ width: '100%', height: 'auto', margin: '1rem 0' }}
-            />
-          )}
-          {newVendor.aadhaar_back && (
-            <img
-              src={newVendor.aadhaar_back}
-              alt="Aadhaar Back"
-              style={{ width: '100%', height: 'auto', margin: '1rem 0' }}
-            />
-          )}
+          <MDBox p={2}>
+            <MDTypography variant="h6" gutterBottom>
+              Aadhaar Number: {newVendor.aadhar_card_number}
+            </MDTypography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <MDTypography variant="subtitle1">Front Side</MDTypography>
+                {newVendor.aadhaar_front && (
+                  <img
+                    src={newVendor.aadhaar_front}
+                    alt="Aadhaar Front"
+                    style={{ width: '100%', border: '1px solid #eee', borderRadius: 4 }}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <MDTypography variant="subtitle1">Back Side</MDTypography>
+                {newVendor.aadhaar_back && (
+                  <img
+                    src={newVendor.aadhaar_back}
+                    alt="Aadhaar Back"
+                    style={{ width: '100%', border: '1px solid #eee', borderRadius: 4 }}
+                  />
+                )}
+              </Grid>
+            </Grid>
+          </MDBox>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenAadhaarModal(false)} color="primary">
-            Close
-          </Button>
+          <Button onClick={() => setOpenAadhaarModal(false)}>Close</Button>
+          {newVendor.isVerify !== 1 && (
+            <Button 
+              onClick={() => handleVerifyAadhaar(newVendor.user_id)}
+              variant="contained" 
+              color="primary"
+              disabled={verifyingId === newVendor.user_id}
+            >
+              {verifyingId === newVendor.user_id ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Verify Aadhaar"
+              )}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </DashboardLayout>

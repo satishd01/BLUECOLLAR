@@ -150,8 +150,8 @@ const routes = [
   {
     type: "collapse",
     name: "Post-Request", // Adding the Schools menu item
-    key: "Job-Requests",
-    route: "/Job-requests",
+    key: "post-Requests",
+    route: "/post-requests",
     icon: (
       <i className="material-icons" style={{ color: "white" }}>
         school
@@ -173,32 +173,32 @@ const routes = [
     component: < Orders/>, // The component to render
     layout: "/admin",
   },
-  {
-    type: "collapse",
-    name: "Job", // Adding the Schools menu item
-    key: "Govt Jobs",
-    route: "/govt-jobs",
-    icon: (
-      <i className="material-icons" style={{ color: "white" }}>
-        school
-      </i>
-    ), // Icon for schools
-    component: < GovernmentJobs/>, // The component to render
-    layout: "/admin",
-  },
-  {
-    type: "collapse",
-    name: "Job Applications", // Adding the Schools menu item
-    key: "Apllications",
-    route: "/Applications",
-    icon: (
-      <i className="material-icons" style={{ color: "white" }}>
-        school
-      </i>
-    ), // Icon for schools
-    component: < GovernmentJobApplications/>, // The component to render
-    layout: "/admin",
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Job", // Adding the Schools menu item
+  //   key: "Govt Jobs",
+  //   route: "/govt-jobs",
+  //   icon: (
+  //     <i className="material-icons" style={{ color: "white" }}>
+  //       school
+  //     </i>
+  //   ), // Icon for schools
+  //   component: < GovernmentJobs/>, // The component to render
+  //   layout: "/admin",
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Job Applications", // Adding the Schools menu item
+  //   key: "Apllications",
+  //   route: "/Applications",
+  //   icon: (
+  //     <i className="material-icons" style={{ color: "white" }}>
+  //       school
+  //     </i>
+  //   ), // Icon for schools
+  //   component: < GovernmentJobApplications/>, // The component to render
+  //   layout: "/admin",
+  // },
   {
     type: "collapse",
     name: "blog", // Adding the Schools menu item
