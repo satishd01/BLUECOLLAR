@@ -64,7 +64,7 @@ function SubCategories() {
 
   const handleCreateSubCategory = async () => {
     try {
-      const response = await fetch("http://bluecollar.sndktech.online/api/sub-categories/create", {
+      const response = await fetch("https://bluecollar.sndktech.online/api/sub-categories/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ function SubCategories() {
   const handleUpdateSubCategory = async () => {
     try {
       const response = await fetch(
-        `http://bluecollar.sndktech.online/api/sub-categories/update/${newSubCategory.id}`,
+        `https://bluecollar.sndktech.online/api/sub-categories/update/${newSubCategory.id}`,
         {
           method: "PUT",
           headers: {
@@ -137,7 +137,7 @@ function SubCategories() {
 
     try {
       const response = await fetch(
-        `http://bluecollar.sndktech.online/api/sub-categories/delete/${id}`,
+        `https://bluecollar.sndktech.online/api/sub-categories/delete/${id}`,
         {
           method: "DELETE",
         }
