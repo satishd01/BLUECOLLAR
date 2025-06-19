@@ -99,7 +99,7 @@ function Footer({ company, links }) {
 
 // Setting default values for the props of Footer
 Footer.defaultProps = {
-  company: { name: "KARTAVYA" },
+  company: { name: "Karmika " },
   links: [],
 };
 
