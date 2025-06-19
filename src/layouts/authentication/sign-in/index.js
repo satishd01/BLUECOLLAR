@@ -8,7 +8,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import logo from "assets/images/logo.jpeg"; // Import your logo here
+import logo from "assets/images/logo.png"; // Import your logo here
 import axios from "axios";
 
 function Basic() {
@@ -54,18 +54,18 @@ function Basic() {
     <BasicLayout image={bgImage}>
       <Card>
         <MDBox
-          variant="gradient"
-          bgColor="info"
+          variant="contained"
+          bgColor="white"
           borderRadius="lg"
-          coloredShadow="info"
+          coloredShadow="error"
           mx={2}
           mt={1}
-          p={2}
+          p={1}
           mb={1}
           textAlign="center"
         >
           {/* Add the logo at the top */}
-          <MDBox mb={5}>
+          <MDBox mb={2}>
             <img
               src={logo} // Your logo image path
               alt="Logo"
