@@ -71,6 +71,7 @@ import Orders from "layouts/tables/Orders";
 import GovernmentJobs from "layouts/tables/Govtjobs";
 import GovernmentJobApplications from "layouts/tables/Jobapplications";
 import Blogs from "layouts/tables/blog";
+import SubCategories from "layouts/tables/sub-category";
 
 const routes = [
   {
@@ -118,6 +119,19 @@ const routes = [
       </i>
     ), // Icon for students
     component: <Categories />, // The component to render
+    layout: "/admin",
+  },
+    {
+    type: "collapse",
+    name: " SubCategory", // Adding the Students menu item
+    key: "SubCategory",
+    route: "/sub-category",
+    icon: (
+      <i className="material-icons" style={{ color: "white" }}>
+        group
+      </i>
+    ), // Icon for students
+    component: <SubCategories />, // The component to render
     layout: "/admin",
   },
   {
